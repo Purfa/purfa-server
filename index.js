@@ -17,7 +17,7 @@ const bodyParser 	= require('body-parser');
 // --------------------------------------------------
 const apiRouter 			= require('./api/index');
 
-const imageStorageService 	= require('./services/imageStorage/image-storage');
+// const imageStorageService 	= require('./services/imageStorage/image-storage');
 const databaseService		= require('./services/Database/database');
 
 
@@ -47,7 +47,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // --------------------------------------------------
 // SERVICES CONFIGURATION
 // --------------------------------------------------
-imageStorageService	.configure();
+// imageStorageService	.configure();
 databaseService		.configure();
 
 // --------------------------------------------------
