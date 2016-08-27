@@ -1,11 +1,30 @@
+'use strict';
 
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+// --------------------------------------------------
+// LIBRARY INCLUDING
+// --------------------------------------------------
+const express 		= require('express');
+const path 			= require('path');
+const favicon 		= require('serve-favicon');
+const logger 		= require('morgan');
+const cookieParser 	= require('cookie-parser');
+const bodyParser 	= require('body-parser');
 
+
+
+// --------------------------------------------------
+// LOCAL DEPENDENCIES
+// --------------------------------------------------
+const apiRouter 			= require('./api/index');
+
+const imageStorageService 	= require('./services/imageStorage/image-storage');
+const databaseService		= require('./services/Database/database');
+
+
+
+// --------------------------------------------------
+// EXPRESS APPLICATION SETTINGS
+// --------------------------------------------------
 var app = express();
 
 app.set('port', (process.env.PORT || 5000));
@@ -19,16 +38,26 @@ app.set('view engine', 'jade');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.get('/', function(request, response) {
-  response.render('pages/index');
-});
+// --------------------------------------------------
+// SERVICES CONFIGURATION
+// --------------------------------------------------
+imageStorageService	.configure();
+databaseService		.configure();
 
+// --------------------------------------------------
+// ROUTES CONFIGURATION
+// --------------------------------------------------
+app.use('/api/v1', apiRouter);
+
+// --------------------------------------------------
+// APP STARTUP
+// --------------------------------------------------
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
