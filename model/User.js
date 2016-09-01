@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const Promise = require('bluebird');
 
 const userSchema = mongoose.Schema({
+	admin		: Boolean,
+	password	: String,
 	firstName	: String,
 	lastName	: String,
 	bio			: String,

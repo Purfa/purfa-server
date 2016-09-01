@@ -18,13 +18,13 @@ const prepareRequest = (kairosRequest) => {
 
 	Params:
 
-	- photo: A photo object.
-	- userName: The name for the user 
-	- galleryName: The gallery name in which the photo will be added
+	- photo: A base 64 image.
+	- userName: The name for the user.
+	- galleryName: The gallery name in which the photo will be added.
 */
 module.exports.enroll = (photo, userName, galleryName) => {
 	const requestParams = {
-	    "image"			: photo.contents,
+	    "image"			: photo,
 	    "subject_id"	: userName,
 	    "gallery_name"	: galleryName,
 	    "selector"		: "SETPOSE",
