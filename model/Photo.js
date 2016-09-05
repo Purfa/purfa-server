@@ -19,7 +19,7 @@ photoSchema.methods.save = () => {
 			}
 		})
 	});	
-}
+};
 
 const Photo = mongoose.model('Photo', photoSchema);
 

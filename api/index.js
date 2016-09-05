@@ -8,23 +8,32 @@ const Photo 					= require('../model/Photo');
 const kairosRequester 			= require('../services/kairos/kairos-requester');
 
 // Endpoints
-const enrollEndpointRouter 		= require('./endpoints/enroll');
-const loginEndpointRouter 		= require('./endpoints/login');
-const recognizeEndpointRouter	= require('./endpoints/recognize');
-const registerEndpointRouter	= require('./endpoints/register');
+
+const loginEndpointRouter 			= require('./auth/login');
+const registerEndpointRouter		= require('./auth/register');
+
+const peopleEndpointRouter 			= require('./face-recognition/people');
+const galleriesEndpointRequester	= require('./face-recognition/galleries');
+const recognizeEndpointRouter		= require('./face-recognition/recognize');
 
 
 // --------------------------------------------------
 // SETUP
 // --------------------------------------------------
 
-router.use('/enroll'	, enrollEndpointRouter);
+// Auth
 router.use('/login'		, loginEndpointRouter);
-router.use('/recognize'	, recognizeEndpointRouter);	
 router.use('/register'	, registerEndpointRouter);
 
+// Face recognition
+router.use('/people'	, peopleEndpointRouter);
+router.use('/galleries'	, galleriesEndpointRequester);
+router.use('/recognize'	, recognizeEndpointRouter);	
+
 router.get('/test', (req, res) => {
-	res.send('holi');
+	res.json({
+		"Hola": "Mundo"
+	});
 });	
 
 module.exports = router;

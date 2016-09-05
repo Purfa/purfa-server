@@ -3,6 +3,12 @@
 const express = require('express');
 const router = express.Router();
 
+
+const User = require('../../model/User');
+const Photo = require('../../model/Photo');
+const kairosService = require('../../services/kairos/kairos-requester');
+
+
 router.post('/', (req, res) => {
 	const image = req.body.image;
 
@@ -22,7 +28,7 @@ router.post('/', (req, res) => {
 		return;
 	}
 
-	kairosRequester
+	kairosService
 		.recognize(image, 'admin')
 		.then((response) => {
 			res.status(200).json({

@@ -4,12 +4,110 @@ const request = require('superagent');
 const Promise = require('bluebird');
 const configuration = require('./config');
 
+const BASE_URL = 'https://api.kairos.com'
+
+// ----------------------------------------
+// 					Utils
+// ----------------------------------------
 const prepareRequest = (kairosRequest) => {
 	return kairosRequest
 		.set('Content-Type', 'application/json')
 		.set('app_id', configuration.KAIROS_APP_ID)
 		.set('app_key', configuration.KAIROS_KEY);
-}
+};
+
+const postRequest = (endpoint, params) => {
+	let rawRequest = request.post(BASE_URL + endpoint);
+	if (params) {
+		rawRequest = rawRequest.send(params);
+	}
+
+	return prepareRequest(rawRequest);
+};
+
+const buildRequestPromise = (endpoint, params) => {
+	return new Promise((resolve, reject) => {
+		postRequest(endpoint, params)
+			.end((error, response) => {
+				if (error) {
+						console.log('KAIROS ERROR');
+						reject(error);
+					} else {
+						console.log(response);
+
+						const responseJSON = JSON.parse(response.text);
+						if (responseJSON) {
+							resolve(responseJSON);
+						} else {
+							reject({
+								"code": "INTERNAL_SERVER_ERROR",
+								"message": "Error en consulta de Kairos"
+							});
+						}
+					}
+			});
+	});
+};
+
+// ----------------------------------------
+// 				  Endpoints
+// ----------------------------------------
+
+/**
+	Devuelve una promise que contiene todas las personas registradas
+	en Kairos.
+*/
+module.exports.getAllPeople = (_gallery) => {
+	let gallery = "admin";
+	if (_gallery) {
+		gallery = _gallery;
+	}
+
+	return buildRequestPromise('/gallery/view', {
+			"gallery_name": gallery
+		})
+		.then((response) => {
+			return new Promise((resolve, reject) => {
+				resolve(response.subject_ids);
+			});
+		});
+};
+
+
+/**
+	Elimina una persona registrada en una galeria de kairos.
+*/
+module.exports.removePerson = (personName, galleryName) => {
+
+	if(!personName) {
+		return new Promise((resolve, reject) => {
+			reject({
+				"code": "CLIENT_ERROR",
+				"message": "El nombre de la persona es requerido (nombre del parametro: person_name)"
+			});
+		});
+	}
+
+	let _galleryName = "admin";
+
+	if (galleryName) {
+		_galleryName = galleryName;
+	}
+
+	return buildRequestPromise('/gallery/remove_subject', {
+		"gallery_name": _galleryName,
+		"subject_id": personName
+	});
+};
+
+/**
+	Devuelve una promise que contiene todas las galerias registradas
+	en Kairos.
+*/
+module.exports.getAllGalleries = () => {
+	return buildRequestPromise('/gallery/list_all')
+		.then((response) => response.gallery_ids);
+};
 
 /**
 	Takes a photo and returns the facial features it finds.
@@ -31,23 +129,7 @@ module.exports.enroll = (photo, userName, galleryName) => {
 	    "symmetricFill"	: "true"
 	};
 
-	const enrollRequest =
-		request
-			.post('https://api.kairos.com/enroll')
-			.send(requestParams);
-
-	return new Promise((resolve, reject) => {
-		prepareRequest(enrollRequest)
-			.end((error, response) => {
-				if (error) {
-					console.log('ERROR ENROLLING USER');
-					reject(error);
-				} else {
-					console.log(response);
-					resolve(response);
-				}
-			});	
-	});
+	return buildRequestPromise('/enroll', requestParams);
 };	
 
 /**
@@ -70,7 +152,7 @@ module.exports.recognize = (photo, galleryName) => {
 
 	const recognizeRequest =
 		request
-			.post('https://api.kairos.com/recognize')
+			.post(BASE_URL + '/recognize')
 			.send(requestParams);
 
 	return new Promise((resolve, reject) => {
@@ -91,6 +173,8 @@ module.exports.recognize = (photo, galleryName) => {
 						});
 						return;
 					}
+
+					console.log("RESPONSE JSON => " + JSON.stringify(responseJSON));
 
 					const firstCandidate = responseJSON.images[0].candidates[0];
 					const probabilityToMatch = firstCandidate[Object.keys(firstCandidate)[0]];
