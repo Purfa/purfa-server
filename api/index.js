@@ -31,8 +31,9 @@ router.use('/galleries'	, galleriesEndpointRequester);
 router.use('/recognize'	, recognizeEndpointRouter);	
 
 router.get('/test', (req, res) => {
-	res.json({
-		"Hola": "Mundo"
+	res.send({
+		"nombre": "Ari",
+		"edad": 42
 	});
 });	
 
