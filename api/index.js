@@ -12,9 +12,9 @@ const kairosRequester 			= require('../services/kairos/kairos-requester');
 const loginEndpointRouter 			= require('./auth/login');
 const registerEndpointRouter		= require('./auth/register');
 
-const peopleEndpointRouter 			= require('./face-recognition/people');
+const peopleEndpointRouter 			= require('./face-recognition-plus/people');
 const galleriesEndpointRequester	= require('./face-recognition/galleries');
-const recognizeEndpointRouter		= require('./face-recognition/recognize');
+const recognizeEndpointRouter		= require('./face-recognition-plus/recognize');
 
 
 // --------------------------------------------------
@@ -32,8 +32,7 @@ router.use('/recognize'	, recognizeEndpointRouter);
 
 router.get('/test', (req, res) => {
 	res.send({
-		"nombre": "Ari",
-		"edad": 42
+		"Hola": "Mundo"
 	});
 });	
 

@@ -3,7 +3,7 @@
 const Promise 			= require('bluebird');
 const configuration 	= require('./image-storage-config');
 const cloudinary 		= require('cloudinary');
-
+const fileSystem		= require('../file-system/file-system');
 
 
 module.exports.configure = () => {
@@ -14,11 +14,29 @@ module.exports.configure = () => {
 	});
 };
 
-module.exports.upload = (image) => {
-	
+const upload = (image) => {
+	return new Promise((resolve, reject) => {		
+		cloudinary.uploader.upload(image, (result) => { 
+			const url = result.url;
 
-	
-	cloudinary.uploader.upload("my_picture.jpg", (result) => { 
-		console.log(result) 
+			if(!url) {
+				reject({
+					"code": "IMAGE_UPLOAD_FAIL"
+				});
+			} else {
+				resolve(url);	
+			}
+		});
 	});
 };	
+
+module.exports.upload = upload;
+
+
+module.exports.saveImage = (image, path) => {
+	return fileSystem
+		.saveImage(image, path)
+		.then(() => {
+			return upload(path);
+		})
+}
